@@ -733,8 +733,8 @@ static void htlc_accepted_hook_serialize(struct htlc_accepted_hook_payload *p,
 
 	json_object_start(s, "htlc");
 	json_add_amount_msat_only(s, "amount", hin->msat);
-	json_add_u64(s, "cltv_expiry", expiry);
-	json_add_member(s, "cltv_expiry_relative", "%d", expiry - blockheight);
+	json_add_u32(s, "cltv_expiry", expiry);
+	json_add_s32(s, "cltv_expiry_relative", expiry - blockheight);
 	json_add_hex(s, "payment_hash", hin->payment_hash.u.u8, sizeof(hin->payment_hash));
 	json_object_end(s);
 }
