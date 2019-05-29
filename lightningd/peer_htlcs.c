@@ -674,10 +674,13 @@ htlc_accepted_hook_deserialize(const tal_t *ctx, const char *buffer,
 		response->result = htlc_accepted_fail;
 		failcodetok = json_get_member(buffer, toks, "failure_code");
 		chanupdtok = json_get_member(buffer, toks, "channel_update");
-		if (!failcodetok || !json_to_number(buffer, failcodetok,
-						    &response->failure_code)) {
+		if (failcodetok && !json_to_number(buffer, failcodetok,
+						   &response->failure_code))
+			fatal("Plugin provided a non-numeric failcode "
+			      "in response to an htlc_accepted hook");
+
+		if (!failcodetok)
 			response->failure_code = WIRE_TEMPORARY_NODE_FAILURE;
-		}
 
 		if (chanupdtok)
 			response->channel_update =
