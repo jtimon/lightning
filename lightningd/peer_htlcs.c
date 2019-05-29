@@ -676,14 +676,7 @@ htlc_accepted_hook_deserialize(const tal_t *ctx, const char *buffer,
 		chanupdtok = json_get_member(buffer, toks, "channel_update");
 		if (!failcodetok || !json_to_number(buffer, failcodetok,
 						    &response->failure_code)) {
-			/* Use unknown payment hash since it has no
-			 * long lasting effect but will still prevent
-			 * the sender from retrying. In the newest
-			 * spec it is called "incorrect or unknown
-			 * payment details" which matches our use-case
-			 * pretty closely. */
-			response->failure_code =
-			    WIRE_INCORRECT_OR_UNKNOWN_PAYMENT_DETAILS;
+			response->failure_code = WIRE_TEMPORARY_NODE_FAILURE;
 		}
 
 		if (chanupdtok)
