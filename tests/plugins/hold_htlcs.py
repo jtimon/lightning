@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plugin that holds on to HTLCs indefinitely.
+"""Plugin that holds on to HTLCs for 10 seconds.
 
 Used to test restarts / crashes while HTLCs were accepted, but not yet
 settled/forwarded/
