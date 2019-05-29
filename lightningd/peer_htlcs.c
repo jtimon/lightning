@@ -684,7 +684,7 @@ htlc_accepted_hook_callback(struct htlc_accepted_hook_payload *request,
 	if (rs->nextcase == ONION_FORWARD) {
 		struct gossip_resolve *gr = tal(ld, struct gossip_resolve);
 
-		gr->next_onion = tal_steal(gr, request->next_onion); serialize_onionpacket(gr, rs->next);
+		gr->next_onion = tal_steal(gr, request->next_onion);
 		gr->next_channel = rs->hop_data.channel_id;
 		gr->amt_to_forward = rs->hop_data.amt_forward;
 		gr->outgoing_cltv_value = rs->hop_data.outgoing_cltv;
