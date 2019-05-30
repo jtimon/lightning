@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config: Added a default plugin directory : `lightning_dir/plugins`. Each plugin directory it contains will be added to lightningd on startup.
 - DB: Store the signatures of channel announcement sent from remote peer into DB, and init channel with signatures from DB directly when reenable the channel.
 (Issue [#2409](https://github.com/ElementsProject/lightning/issues/2409))
+- plugin: A new hook was added to interact with incoming HTLCs. HTLCs can be resolved, rejected or continued in the plugin, allowing enforcement of custom policies, short-circuiting of payments, and alternative transports (PR [#2267](https://github.com/ElementsProject/lightning/pull/226)])
 
 ### Changed
 
