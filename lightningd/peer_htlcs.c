@@ -662,7 +662,7 @@ htlc_accepted_hook_deserialize(const tal_t *ctx, const char *buffer,
 	 * this is the default behavior for this hook anyway */
 	if (!resulttok) {
 		fatal("Plugin return value does not contain 'result' key %s",
-		      json_tok_full(buffer, toks));
+		      json_strdup(tmpctx, buffer, toks));
 	}
 
 	if (json_tok_streq(buffer, resulttok, "continue")) {
@@ -695,7 +695,7 @@ htlc_accepted_hook_deserialize(const tal_t *ctx, const char *buffer,
 			fatal(
 			    "Plugin did not specify a 'payment_key' in return "
 			    "value to the htlc_accepted hook: %s",
-			    json_tok_full(buffer, resulttok));
+			    json_strdup(tmpctx, buffer, resulttok));
 
 		if (!json_to_preimage(buffer, paykeytok,
 				      &response->payment_key))
@@ -704,7 +704,7 @@ htlc_accepted_hook_deserialize(const tal_t *ctx, const char *buffer,
 	} else {
 		fatal("Plugin responded with an unknown result to the "
 		      "htlc_accepted hook: %s",
-		      json_tok_full(buffer, resulttok));
+		      json_strdup(tmpctx, buffer, resulttok));
 	}
 
 	return response;
