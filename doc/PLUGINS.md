@@ -361,7 +361,7 @@ The payload of the hook call has the following format:
       "realm": "00",
       "short_channel_id": "1x2x3",
       "forward_amount": "42msat",
-      "outgoing_ctlv_value": 500014
+      "outgoing_cltv_value": 500014
     }
   },
   "next_onion": "[1365bytes of serialized onion]",
@@ -389,7 +389,7 @@ type-length-vale (TLV) payload will be added (pending specification). For detail
      payment).
    - `forward_amount` is the amount we should be forwarding to the next hop,
      and should match the incoming funds in case we are the recipient.
-   - `outgoing_ctlv_value` determines what the CLTV value for the HTLC that we
+   - `outgoing_cltv_value` determines what the CLTV value for the HTLC that we
      forward to the next hop should be.
  - `next_onion` is the fully processed onion that we should be sending to the
    next hop as part of the outgoing HTLC. Processed in this case means that we
