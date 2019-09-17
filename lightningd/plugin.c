@@ -1,5 +1,6 @@
 #include "lightningd/plugin.h"
 
+#include <bitcoin/chainparams.h>
 #include <ccan/array_size/array_size.h>
 #include <ccan/intmap/intmap.h>
 #include <ccan/io/io.h>
@@ -16,6 +17,7 @@
 #include <common/timeout.h>
 #include <dirent.h>
 #include <errno.h>
+#include <lightningd/bitcoind.h>
 #include <lightningd/json.h>
 #include <lightningd/lightningd.h>
 #include <lightningd/notification.h>
@@ -1059,6 +1061,9 @@ static void plugin_config(struct plugin *plugin)
 	json_object_start(req->stream, "configuration");
 	json_add_string(req->stream, "lightning-dir", ld->config_dir);
 	json_add_string(req->stream, "rpc-file", ld->rpc_filename);
+	json_add_string(
+	    req->stream, "network",
+	    plugin->plugins->ld->topology->bitcoind->chainparams->network_name);
 	json_object_end(req->stream);
 
 	jsonrpc_request_end(req);

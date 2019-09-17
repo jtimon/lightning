@@ -1,3 +1,4 @@
+#include <bitcoin/chainparams.h>
 #include <ccan/err/err.h>
 #include <ccan/intmap/intmap.h>
 #include <ccan/json_out/json_out.h>
@@ -513,10 +514,10 @@ static struct command_result *handle_init(struct command *init_cmd,
 					  const struct plugin_option *opts,
 					  void (*init)(struct plugin_conn *))
 {
-	const jsmntok_t *rpctok, *dirtok, *opttok, *t;
+	const jsmntok_t *configtok, *rpctok, *dirtok, *opttok, *nettok, *t;
 	struct sockaddr_un addr;
 	size_t i;
-	char *dir;
+	char *dir, *network;
 	struct json_out *param_obj;
 
 	/* Move into lightning directory: other files are relative */
@@ -525,7 +526,11 @@ static struct command_result *handle_init(struct command *init_cmd,
 	if (chdir(dir) != 0)
 		plugin_err("chdir to %s: %s", dir, strerror(errno));
 
-	rpctok = json_delve(buf, params, ".configuration.rpc-file");
+	nettok = json_delve(buf, configtok, ".network");
+	network = json_strdup(tmpctx, buf, nettok);
+	chainparams = chainparams_for_network(network);
+
+	rpctok = json_delve(buf, configtok, ".rpc-file");
 	rpc_conn.fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (rpctok->end - rpctok->start + 1 > sizeof(addr.sun_path))
 		plugin_err("rpc filename '%.*s' too long",

@@ -15,6 +15,7 @@ struct json_out;
 struct plugin_conn;
 
 extern bool deprecated_apis;
+const struct chainparams *chainparams;
 
 /* Create an array of these, one for each command you support. */
 struct plugin_command {
