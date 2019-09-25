@@ -1,3 +1,4 @@
+#include <bitcoin/chainparams.h>
 #include <ccan/array_size/array_size.h>
 #include <ccan/cast/cast.h>
 #include <ccan/intmap/intmap.h>
@@ -1041,6 +1042,10 @@ static struct command_result *json_pay(struct command *cmd,
 	if (!b11) {
 		return command_fail(cmd, JSONRPC2_INVALID_PARAMS,
 				    "Invalid bolt11: %s", fail);
+	}
+
+	if (b11->chain != chainparams) {
+		return command_fail(cmd, PAY_ROUTE_NOT_FOUND, "Invoice is for another network %s", b11->chain->network_name);
 	}
 
 	if (time_now().ts.tv_sec > b11->timestamp + b11->expiry) {
