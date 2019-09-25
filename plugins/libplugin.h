@@ -16,6 +16,8 @@ struct plugin_conn;
 
 extern bool deprecated_apis;
 
+extern const struct chainparams *chainparams;
+
 enum plugin_restartability {
 	PLUGIN_STATIC,
 	PLUGIN_RESTARTABLE
