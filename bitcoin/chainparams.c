@@ -25,6 +25,12 @@ static u8 liquid_regtest_fee_asset[] = {
     0x05, 0x71, 0x49, 0x9c, 0x03, 0x62, 0x8a, 0x38, 0x51, 0xb8, 0xce,
 };
 
+static u8 chain_3_fee_asset[] = {
+    0x01, 0xc8, 0x13, 0x05, 0x15, 0x07, 0xd3, 0x7f, 0x90, 0x97, 0x86,
+    0x8f, 0x0c, 0x75, 0x2c, 0x66, 0x90, 0x17, 0x18, 0x77, 0xda, 0x91,
+    0x08, 0xa5, 0x8a, 0xbe, 0xf3, 0x44, 0xcc, 0xc1, 0x21, 0x60, 0x1a,
+};
+
 const struct chainparams networks[] = {
     {.network_name = "bitcoin",
      .bip173_name = "bc",
@@ -184,6 +190,28 @@ const struct chainparams networks[] = {
      .p2sh_version = 75,
      .testnet = true,
      .fee_asset_tag = liquid_regtest_fee_asset,
+     .bip32_key_version = {.bip32_pubkey_version = BIP32_VER_TEST_PUBLIC,
+			   .bip32_privkey_version = BIP32_VER_TEST_PRIVATE},
+     .is_elements = true},
+    {.network_name = "chain_3",
+     .bip173_name = "bcc",
+     .bip70_name = "chain_3",
+     .genesis_blockhash = {{{.u.u8 = {0x34, 0xbf, 0x17, 0x51, 0xfd, 0x81, 0x08,
+				      0x7a, 0x81, 0xaa, 0xe0, 0xb1, 0x6c, 0x6e,
+				      0x7b, 0xff, 0xcf, 0xe5, 0x57, 0x4f, 0xce,
+				      0x01, 0x3e, 0x9d, 0xdd, 0x2e, 0x10, 0x0c,
+				      0x03, 0x8f, 0x90, 0x46}}}},
+     .rpc_port = 18565,
+     .cli = "elements-cli",
+     .cli_args = "-chain=chain_3",
+     .dust_limit = {546},
+     .max_funding = AMOUNT_SAT_INIT((1 << 24) - 1),
+     .max_payment = AMOUNT_MSAT_INIT(0xFFFFFFFFULL),
+     .when_lightning_became_cool = 1,
+     .p2pkh_version = 91,
+     .p2sh_version = 75,
+     .testnet = true,
+     .fee_asset_tag = chain_3_fee_asset,
      .bip32_key_version = {.bip32_pubkey_version = BIP32_VER_TEST_PUBLIC,
 			   .bip32_privkey_version = BIP32_VER_TEST_PRIVATE},
      .is_elements = true},
