@@ -1070,6 +1070,10 @@ static struct command_result *json_decodepay(struct command *cmd,
 		return command_fail(cmd, LIGHTNINGD, "Invalid bolt11: %s", fail);
 	}
 
+	if (b11->chain->bip173_name != get_chainparams(cmd->ld)->bip173_name) {
+		return command_fail(cmd, LIGHTNINGD, "Invalid bolt11: the invoice refers to chain %s whereas the node operates in chain %s", b11->chain->network_name, get_chainparams(cmd->ld)->network_name);
+	}
+
 	response = json_stream_success(cmd);
 	json_add_string(response, "currency", b11->chain->bip173_name);
 	json_add_u64(response, "created_at", b11->timestamp);
