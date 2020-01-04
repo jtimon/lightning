@@ -1484,3 +1484,76 @@ static const struct json_command createonion_command = {
 	"Create an onion going through the provided nodes, each with its own payload"
 };
 AUTODATA(json_command, &createonion_command);
+
+static struct command_result *json_createtrampolineonion(struct command *cmd,
+						const char *buffer,
+						const jsmntok_t *obj UNNEEDED,
+						const jsmntok_t *params)
+{
+	struct json_stream *response;
+	struct secret *session_key, *tramp_session_key, *shared_secrets;
+	struct sphinx_path *sp, *tramp_sp;
+	u8 *assocdata, *serialized, *tramp_serialized;
+	struct onionpacket *packet, *tramp_packet;
+	struct sphinx_hop *tramp_hops, *hops;
+
+	if (!param(cmd, buffer, params,
+		   p_req("trampoline_hops", param_hops_array, &tramp_hops),
+		   p_req("hops", param_hops_array, &hops),
+		   p_req("assocdata", param_bin_from_hex, &assocdata),
+		   p_opt("trampoline_session_key", param_secret, &tramp_session_key),
+		   p_opt("session_key", param_secret, &session_key),
+		   NULL)) {
+		return command_param_failed();
+	}
+
+	if (tramp_session_key == NULL)
+		tramp_sp = sphinx_path_new(cmd, assocdata);
+	else
+		tramp_sp = sphinx_path_new_with_key(cmd, assocdata, tramp_session_key);
+
+	for (size_t i=0; i<tal_count(hops); i++)
+		sphinx_add_hop(tramp_sp, &hops[i].pubkey, hops[i].raw_payload);
+
+	tramp_packet = create_onionpacket_parametrized(true, cmd, tramp_sp, &shared_secrets);
+	if (!tramp_packet)
+		return command_fail(cmd, LIGHTNINGD,
+				    "Could not create trampoline onion packet");
+
+	tramp_serialized = serialize_onionpacket(cmd, tramp_packet);
+
+	if (session_key == NULL)
+		sp = sphinx_path_new(cmd, assocdata);
+	else
+		sp = sphinx_path_new_with_key(cmd, assocdata, session_key);
+
+	for (size_t i=0; i<tal_count(hops)-1; i++)
+		sphinx_add_hop(sp, &hops[i].pubkey, hops[i].raw_payload);
+
+	/* Add the trampoline onionpacket instead of the last raw payload */
+	sphinx_add_hop(sp, &hops[tal_count(hops)-1].pubkey, tramp_serialized);
+
+	packet = create_onionpacket(cmd, sp, &shared_secrets);
+	if (!packet)
+		return command_fail(cmd, LIGHTNINGD,
+				    "Could not create onion packet");
+
+	serialized = serialize_onionpacket(cmd, packet);
+
+	response = json_stream_success(cmd);
+	json_add_hex(response, "onion", serialized, tal_bytelen(serialized));
+	json_array_start(response, "shared_secrets");
+	for (size_t i=0; i<tal_count(tramp_hops)+tal_count(hops); i++) {
+		json_add_secret(response, NULL, &shared_secrets[i]);
+	}
+	json_array_end(response);
+	return command_success(cmd, response);
+}
+
+static const struct json_command createtrampolineonion_command = {
+	"createtrampolineonion",
+	"payment",
+	json_createtrampolineonion,
+	"Create an onion going through the provided nodes, each with its own payload"
+};
+AUTODATA(json_command, &createtrampolineonion_command);

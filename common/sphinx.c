@@ -378,7 +378,8 @@ static void sphinx_write_frame(u8 *dest, const struct sphinx_hop *hop)
 	memcpy(dest + tal_bytelen(hop->raw_payload), hop->hmac, HMAC_SIZE);
 }
 
-struct onionpacket *create_onionpacket(
+struct onionpacket *create_onionpacket_parametrized(
+	bool is_trampoline_packet,
 	const tal_t *ctx,
 	struct sphinx_path *sp,
 	struct secret **path_secrets
@@ -392,6 +393,8 @@ struct onionpacket *create_onionpacket(
 	struct keyset keys;
 	u8 padkey[KEY_LEN];
 	u8 nexthmac[HMAC_SIZE];
+	/* TODO TRAMPOLINE_ROUTING_INFO_SIZE must be used instead of ROUTING_INFO_SIZE if is_trampoline_packet */
+	/* There must be a better way? */
 	u8 stream[ROUTING_INFO_SIZE];
 	struct hop_params *params;
 	struct secret *secrets = tal_arr(ctx, struct secret, num_hops);
@@ -450,6 +453,15 @@ struct onionpacket *create_onionpacket(
 
 	*path_secrets = secrets;
 	return packet;
+}
+
+struct onionpacket *create_onionpacket(
+	const tal_t *ctx,
+	struct sphinx_path *sp,
+	struct secret **path_secrets
+	)
+{
+	return create_onionpacket_parametrized(false, ctx, sp, path_secrets);
 }
 
 /*

@@ -19,6 +19,8 @@
 #define FRAME_SIZE 65
 #define ROUTING_INFO_SIZE 1300
 #define TOTAL_PACKET_SIZE (VERSION_SIZE + PUBKEY_SIZE + HMAC_SIZE + ROUTING_INFO_SIZE)
+#define TRAMPOLINE_ROUTING_INFO_SIZE 400
+#define TRAMPOLINE_TOTAL_PACKET_SIZE (VERSION_SIZE + PUBKEY_SIZE + HMAC_SIZE + TRAMPOLINE_ROUTING_INFO_SIZE)
 
 struct onionpacket {
 	/* Cleartext information */
@@ -83,6 +85,30 @@ struct route_step {
 	struct onionpacket *next;
 	u8 *raw_payload;
 };
+
+
+/**
+ * create_onionpacket_parametrized - Create a new onionpacket that can be routed
+ * over a path of intermediate nodes. Like create_onionpacket, but can be used for trampoline
+ * onion packets.
+ *
+ * @is_trampoline_packet: Whether we want to create a trampoline payment or not
+ * @ctx: tal context to allocate from
+ * @path: public keys of nodes along the path.
+ * @hoppayloads: payloads destined for individual hosts (limited to
+ *    HOP_PAYLOAD_SIZE bytes)
+ * @num_hops: path length in nodes
+ * @sessionkey: 32 byte random session key to derive secrets from
+ * @assocdata: associated data to commit to in HMACs
+ * @assocdatalen: length of the assocdata
+ * @path_secrets: (out) shared secrets generated for the entire path
+ */
+struct onionpacket *create_onionpacket_parametrized(
+	bool is_trampoline_packet,
+	const tal_t * ctx,
+	struct sphinx_path *sp,
+	struct secret **path_secrets
+	);
 
 /**
  * create_onionpacket - Create a new onionpacket that can be routed
