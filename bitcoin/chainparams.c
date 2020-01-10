@@ -114,7 +114,7 @@ const struct chainparams networks[] = {
      .p2sh_version = 196,
      .testnet = true,
      .bip32_key_version = {.bip32_pubkey_version = BIP32_VER_TEST_PUBLIC, .bip32_privkey_version = BIP32_VER_TEST_PRIVATE},
-     .is_elements = false,
+     .is_elements = true,
     },
     /* You don't need this chain to demonstrate your use case, once in chain_2, going back to regtest counts as an extra "chain jump" */
     {.network_name = "chain_3",
